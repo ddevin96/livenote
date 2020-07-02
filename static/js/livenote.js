@@ -236,6 +236,56 @@ function InitThis(mode, path, slide) {
       // Remove top bar
       document.querySelector('.top-bar').style.display = 'none';
     });
+
+    var connection = new RTCMultiConnection();
+
+    // this line is VERY_important
+    connection.socketURL = "http://localhost:9001/";
+   
+    connection.session = {
+      audio: true,
+      video: false,
+      oneway: true
+    };
+
+    connection.mediaConstraints = {
+        audio: true,
+        video: false
+    };
+
+   
+    if (mode == 1) {
+      connection.sdpConstraints.mandatory = {
+        OfferToReceiveAudio: true,
+        OfferToReceiveVideo: false
+    };
+     // var localStream = connection.attachStreams[0];
+     // localStream.mute('both');
+    }else{
+      connection.sdpConstraints.mandatory = {
+        OfferToReceiveAudio: false,
+        OfferToReceiveVideo: false
+    };
+    }
+  
+    // https://www.rtcmulticonnection.org/docs/iceServers/
+    // use your own TURN-server here!
+    connection.iceServers = [{
+        'urls': [
+            'stun:stun.l.google.com:19302',
+            'stun:stun1.l.google.com:19302',
+            'stun:stun2.l.google.com:19302',
+            'stun:stun.l.google.com:19302?transport=udp',
+        ]
+    }];
+
+    connection.openOrJoin('ROOM-1', function(isRoomExist, roomid) {
+      if (!isRoomExist) {
+          console.log("NON ESISTE");
+      }else {
+         console.log("ESISTE");
+      }
+  });
 }
 
 function Draw(x, y, isDown) {

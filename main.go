@@ -10,7 +10,7 @@ import (
 	"strings"
 	"time"
 
-	"livenote/utils"
+	"./utils"
 
 	socketio "github.com/googollee/go-socket.io"
 	"github.com/gorilla/mux"
