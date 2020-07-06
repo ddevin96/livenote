@@ -122,6 +122,7 @@ document.querySelector('#full-screen').addEventListener('click', goFullScreen);
 
 
 var mousePressed = false;
+var touchPressed = false;
 var lastX, lastY;
 var socket = undefined;
 var pID = window.location.pathname.split('/')[1];
@@ -156,7 +157,7 @@ function loadShape(s){
 }
 
 function InitThis(mode, path, slide) {
-    socket = io('wss://'+window.location.host+'/scoket.io/'+pID, { secure:true, reconnect: true, transports: ['websocket'], 'force new connection': true });
+    socket = io('wss://'+window.location.host+'/socket.io/'+pID, { secure:true, reconnect: true, transports: ['websocket'], 'force new connection': true });
     pmode = mode;
   
     socket.on('connect', function(){
@@ -179,18 +180,48 @@ function InitThis(mode, path, slide) {
         });
     }});
 
-    $('#pdf-render').mousedown(function (e) {
-        mousePressed = true;
-        x =  e.pageX - $(this).offset().left
-        y =  e.pageY - $(this).offset().top
-        Draw(x, y, false);
+    document.querySelector('#pdf-render').addEventListener('touchstart', function(e){
+      console.log("starting touch")
+      touchPressed = true;
+      x =  e.pageX - $(this).offset().left
+      y =  e.pageY - $(this).offset().top
+      Draw(x, y, false);
     });
 
-    document.querySelector('#pdf-render').addEventListener('touchstart', startingTouch);
-    document.querySelector('#pdf-render').addEventListener('touchmove', movingTouch);
-    document.querySelector('#pdf-render').addEventListener('touchend', endingTouch);
-    document.querySelector('#pdf-render').addEventListener('touchcancel', cancellingTouch);
+    document.querySelector('#pdf-render').addEventListener('touchmove', function(e){
+      console.log("moving touch here")
+      if (touchPressed) {
+        x =  e.pageX - $(this).offset().left
+        y =  e.pageY - $(this).offset().top
+        Draw(x, y, true);
+        shape['data'].push({"x":x, "y":y});
+      }
+    });
 
+    document.querySelector('#pdf-render').addEventListener('touchend', function(e){
+      console.log("ending touch here")
+      touchPressed = false;
+      socket.emit("event:master:shape", JSON.stringify(shape), function (data) {      
+        console.log('Message shape sent! ');
+      });
+      shape = {"data":[], "width":$(window).width() , "height": $(window).height()}
+    });
+
+    document.querySelector('#pdf-render').addEventListener('touchcancel', function(e){
+      console.log("cancelling touch here")
+      touchPressed = false;
+      socket.emit("event:master:shape", JSON.stringify(shape), function (data) {      
+        console.log('Message shape sent! ');
+      });
+      shape = {"data":[], "width":$(window).width() , "height": $(window).height()}
+    });
+
+    $('#pdf-render').mousedown(function (e) {
+      mousePressed = true;
+      x =  e.pageX - $(this).offset().left
+      y =  e.pageY - $(this).offset().top
+      Draw(x, y, false);
+    });
 
     $('#pdf-render').mousemove(function (e) {
         if (mousePressed) {
@@ -303,39 +334,3 @@ function clearArea() {
     ctx.setTransform(1, 0, 0, 1, 0, 0);
     ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 }
-
-const startingTouch = () => {
-  console.log("start touch here")
-    //   mousePressed = true;
-    //   x =  e.pageX - $(this).offset().left
-    //   y =  e.pageY - $(this).offset().top
-    //   Draw(x, y, false);
-};
-
-const movingTouch = () => {
-  console.log("moving touch here")
-  // if (mousePressed) {
-  //   x =  e.pageX - $(this).offset().left
-  //   y =  e.pageY - $(this).offset().top
-  //   Draw(x, y, true);
-  //   shape['data'].push({"x":x, "y":y});
-  // }
-};
-
-const endingTouch = () => {
-  console.log("ending touch here")
-  // mousePressed = false;
-  // socket.emit("event:master:shape", JSON.stringify(shape), function (data) {      
-  //   console.log('Message shape sent! ');
-  // });
-  // shape = {"data":[], "width":$(window).width() , "height": $(window).height()}
-};
-
-const cancellingTouch = () => {
-  console.log("cancelling touch here")
-  // mousePressed = false;
-  // socket.emit("event:master:shape", JSON.stringify(shape), function (data) {      
-  //   console.log('Message shape sent! ');
-  // });
-  // shape = {"data":[], "width":$(window).width() , "height": $(window).height()}
-};
