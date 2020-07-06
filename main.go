@@ -122,8 +122,8 @@ staticDirFiles := http.FileServer(http.Dir("./static/"))
 		Handler: r,
 		Addr:    ":443",
 		// Good practice: enforce timeouts for servers you create!
-		WriteTimeout: 15 * time.Second,
-		ReadTimeout:  15 * time.Second,
+		WriteTimeout: 60 * time.Second,
+		ReadTimeout:  60 * time.Second,
 		TLSConfig: config,
 	}
 	log.Fatal(srv.ListenAndServeTLS(tlsCertPath, tlsKeyPath))
@@ -215,9 +215,9 @@ func deletePostHandler(w http.ResponseWriter, r *http.Request) {
 
 // indexPostHandler create a session for the user who upload a file, and save this file in a specific folder
 func indexPostHandler(w http.ResponseWriter, r *http.Request) {
-	r.Body = http.MaxBytesReader(w, r.Body, 32<<20+512)
+	r.Body = http.MaxBytesReader(w, r.Body, 100<<20+512)
 	//max 10 MB files
-	r.ParseMultipartForm( 32<<20)
+	r.ParseMultipartForm(100<<20)
 	file, _, err := r.FormFile("file")
 	if err != nil {
 		fmt.Printf("Error parsing file or not file is present to upload")
@@ -334,6 +334,7 @@ func NewLiveNote(id string) {
 
 	server.OnConnect("/", func(s socketio.Conn) error {
 		s.SetContext("")
+		
 		fmt.Println("connected :", s.ID())
 		return nil
 	})

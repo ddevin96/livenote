@@ -157,7 +157,7 @@ function loadShape(s){
 }
 
 function InitThis(mode, path, slide) {
-    socket = io('wss://'+window.location.host+'/socket.io/'+pID, { secure:true, reconnect: true, transports: ['websocket'], 'force new connection': true });
+    socket = io('wss://'+window.location.host+'/socket.io/'+pID, { secure: true, reconnect: true, transports: ['websocket']});
     pmode = mode;
   
     socket.on('connect', function(){
@@ -250,14 +250,10 @@ function InitThis(mode, path, slide) {
     var shape = {"data":[], "width":$(window).width() , "height": $(window).height()}
     // Get Document
 
-
-    console.log("LOADDDDDD "+path)
     pdfjsLib
     .getDocument(path)
     .promise.then(pdfDoc_ => {
       pdfDoc = pdfDoc_;
-
-
 
       document.querySelector('#page-count').textContent = pdfDoc.numPages;
 
@@ -272,7 +268,7 @@ function InitThis(mode, path, slide) {
       // Remove top bar
       document.querySelector('.top-bar').style.display = 'none';
     });
-
+/*
     var connection = new RTCMultiConnection();
 
     // this line is VERY_important
@@ -293,10 +289,7 @@ function InitThis(mode, path, slide) {
         OfferToReceiveVideo: false
      };
 
- 
-  
-    // https://www.rtcmulticonnection.org/docs/iceServers/
-    // use your own TURN-server here!
+
     connection.iceServers = [{
         'urls': [
             'stun:stun.l.google.com:19302',
@@ -312,7 +305,7 @@ function InitThis(mode, path, slide) {
       }else {
          console.log("ESISTE");
       }
-  });
+  });*/
 }
 
 function Draw(x, y, isDown) {
