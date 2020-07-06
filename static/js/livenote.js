@@ -157,13 +157,17 @@ function loadShape(s){
 }
 
 function InitThis(mode, path, slide) {
-    socket = io('wss://'+window.location.host+'/socket.io/'+pID, { secure: true, reconnect: true, transports: ['websocket']});
+    socket = io('https://'+window.location.host+'/socket.io/'+pID, { secure: true, reconnect: true, transports: ['websocket'], 'forceNew':true});
     pmode = mode;
-  
+
+    console.log("try to connect "+'wss://'+window.location.host+'/socket.io/'+pID)
+   
+
     socket.on('connect', function(){
     //socket.emit("event:enter", "userSessionID")
      console.log("client connected to "+pID)
-      if (mode == 1) {
+   
+     if (mode == 1) {
         socket.on( "event:start", function (msg) {
           s = JSON.parse(msg)
           console.log("Presentation start "+msg); 

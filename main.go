@@ -96,7 +96,7 @@ staticDirFiles := http.FileServer(http.Dir("./static/"))
 		WriteTimeout: 15 * time.Second,
 		ReadTimeout:  15 * time.Second,
 	} */
-
+	
 	s, err := socketio.NewServer(nil)
 	server = s
 	if err != nil {
@@ -332,12 +332,6 @@ func NewLiveNote(id string) {
 
 	fmt.Printf("Create live note %s\n", id)
 
-	server.OnConnect("/", func(s socketio.Conn) error {
-		s.SetContext("")
-		
-		fmt.Println("connected :", s.ID())
-		return nil
-	})
 	server.OnConnect(id, func(s socketio.Conn) error {
 		s.SetContext("")
 		s.Join("bcast")
@@ -382,12 +376,12 @@ func userGetHandler(w http.ResponseWriter, r *http.Request) {
 	var user = &User{}
 	user, ok := val.(*User)
 
-	fmt.Printf("Load id:" + code + " for user session " + userSessionID)
+	fmt.Printf("Load id:" + code + " for user session " + userSessionID+"-")
 
 	var p = &Presentation{}
 
 	if !ok {
-		fmt.Println("./static/sessions/" + userSessionID + "/")
+	
 		files, err := ioutil.ReadDir("./static/sessions/" + userSessionID + "/")
 		if err != nil {
 			utils.ExecuteTemplate(w, "error", p)
