@@ -9,7 +9,7 @@ import (
 	"os"
 	"strings"
 	 "crypto/tls" 
-
+	"time"
 	"./utils"
 
 	socketio "github.com/googollee/go-socket.io"
@@ -22,7 +22,7 @@ import (
 const IP = "isiswork00.di.unisa.it"
 
 // PORT local
-const PORT = "8080"
+const PORT = "443"
 
 // Generate a random key
 var store = sessions.NewCookieStore([]byte("top-secret"))
@@ -77,10 +77,18 @@ func main() {
 	r.HandleFunc("/{user-session-id}-{id}", userGetHandler).Methods("GET")
 
 	r.HandleFunc("/delete-presentation", deletePostHandler).Methods("POST")
+	
+
 	//TODO serve static files
-	staticDirFiles := http.FileServer(http.Dir("./static/"))
-	r.PathPrefix("/static/").Handler(http.StripPrefix("/static/", staticDirFiles))
-/* 
+/* 		r2 := mux.NewRouter()
+staticDirFiles := http.FileServer(http.Dir("./static/"))
+	r2.PathPrefix("/static/").Handler(http.StripPrefix("/static/", staticDirFiles))
+	go http.ListenAndServe(":80", r2) */
+
+	staticDirFiles2 := http.FileServer(http.Dir("./static/"))
+	r.PathPrefix("/static/").Handler(http.StripPrefix("/static/", staticDirFiles2))
+
+	/* 
  	srv := &http.Server{
 		Handler: r,
 		Addr:    IP + ":" + PORT,
@@ -103,18 +111,23 @@ func main() {
 
 	r.Handle("/socket.io/", server)
 
-	go http.ListenAndServe(":80", http.HandlerFunc(httpsRedirect))
+	//go http.ListenAndServe(":80", http.HandlerFunc(httpsRedirect))
 
 	//log.Fatal(srv.ListenAndServe())
 	var tlsCertPath = "/etc/letsencrypt/live/isiswork00.di.unisa.it/fullchain.pem"
 	var tlsKeyPath = "/etc/letsencrypt/live/isiswork00.di.unisa.it/privkey.pem"
 
 	config := &tls.Config{MinVersion: tls.VersionTLS10}
-    server := &http.Server{Addr: ":443", Handler: r, TLSConfig: config}
-
-	server.ListenAndServeTLS(tlsCertPath, tlsKeyPath)
+	srv := &http.Server{
+		Handler: r,
+		Addr:    ":443",
+		// Good practice: enforce timeouts for servers you create!
+		WriteTimeout: 15 * time.Second,
+		ReadTimeout:  15 * time.Second,
+		TLSConfig: config,
+	}
+	log.Fatal(srv.ListenAndServeTLS(tlsCertPath, tlsKeyPath))
 	
-
 	//http.ListenAndServe("http://"+IP+":"+PORT, nil)
 }
 
@@ -197,7 +210,7 @@ func deletePostHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	http.Redirect(w, r, "http://"+IP+":"+PORT, 302)
+	http.Redirect(w, r, "https://"+IP, 302)
 }
 
 // indexPostHandler create a session for the user who upload a file, and save this file in a specific folder
@@ -279,7 +292,7 @@ func indexPostHandler(w http.ResponseWriter, r *http.Request) {
 	defer uFile.Close()
 	defer file.Close()
 
-	var url = "http://" + IP + ":" + PORT + "/static/sessions/" + workingDir + "/" + fileid + ".pdf"
+	var url = "https://" + IP +"/static/sessions/" + workingDir + "/" + fileid + ".pdf"
 	user.Files = append(user.Files, url)
 	user.Codes = append(user.Codes, fileid)
 	session.Save(r, w)
@@ -287,7 +300,7 @@ func indexPostHandler(w http.ResponseWriter, r *http.Request) {
 	NewLiveNote("/" + workingDir + "-" + fileid)
 
 	//utils.SavePresentation(fileid, url)
-	http.Redirect(w, r, "http://"+IP+":"+PORT, 302)
+	http.Redirect(w, r, "https://"+IP, 302)
 }
 
 // LoadActiveSessions create the session for all the files uploaded

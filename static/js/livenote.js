@@ -156,7 +156,7 @@ function loadShape(s){
 }
 
 function InitThis(mode, path, slide) {
-    socket = io('ws://'+window.location.host+'/'+pID, { reconnect: true, transports: ['websocket'], 'force new connection': true });
+    socket = io('wss://'+window.location.host+'/scoket.io/'+pID, { secure:true, reconnect: true, transports: ['websocket'], 'force new connection': true });
     pmode = mode;
   
     socket.on('connect', function(){
@@ -218,10 +218,15 @@ function InitThis(mode, path, slide) {
 
     var shape = {"data":[], "width":$(window).width() , "height": $(window).height()}
     // Get Document
+
+
+    console.log("LOADDDDDD "+path)
     pdfjsLib
     .getDocument(path)
     .promise.then(pdfDoc_ => {
       pdfDoc = pdfDoc_;
+
+
 
       document.querySelector('#page-count').textContent = pdfDoc.numPages;
 
@@ -240,12 +245,11 @@ function InitThis(mode, path, slide) {
     var connection = new RTCMultiConnection();
 
     // this line is VERY_important
-    connection.socketURL = "http://isiswork00.di.unisa.it:9001/";
+    connection.socketURL = "https://isiswork00.di.unisa.it:9001/";
    
     connection.session = {
       audio: true,
-      video: false,
-      oneway: true
+      video: false
     };
 
     connection.mediaConstraints = {
@@ -253,20 +257,12 @@ function InitThis(mode, path, slide) {
         video: false
     };
 
-   
-    if (mode == 1) {
       connection.sdpConstraints.mandatory = {
         OfferToReceiveAudio: true,
         OfferToReceiveVideo: false
-    };
-     // var localStream = connection.attachStreams[0];
-     // localStream.mute('both');
-    }else{
-      connection.sdpConstraints.mandatory = {
-        OfferToReceiveAudio: false,
-        OfferToReceiveVideo: false
-    };
-    }
+     };
+
+ 
   
     // https://www.rtcmulticonnection.org/docs/iceServers/
     // use your own TURN-server here!

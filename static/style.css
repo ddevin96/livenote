@@ -10,20 +10,85 @@
 }
 
 .btn {
-  background: coral;
-  color: #fff;
-  border: none;
   outline: none;
   cursor: pointer;
-  padding: 0.7rem 2rem;
+  padding: 0.7rem 0.7rem;
+  font-size: 12px
 }
 body{
   width: 100%;
   font-family: 'Jost';font-size: 22px;
 }
+
+#container {
+  width: 50%;
+  position: relative;
+  margin: auto;
+}
+
+#container #next-page {
+  display: inline-block;
+  width: 10%;
+  height: 7%;
+  position: absolute;
+  top: 50%;
+  right: 0%;
+  background-color: white;
+  opacity: 0.5;
+}
+
+#container #prev-page {
+  display: inline-block;
+  width: 10%;
+  height: 7%;
+  position: absolute;
+  top: 50%;
+  left: 0%;
+  background-color: white;
+  opacity: 0.5;
+}
+
+#container #full-screen {
+  color: black;
+  display: inline-block;
+  position: absolute;
+  top: 0%;
+  right: 0%;
+  background-color: white;
+  opacity: 0.5;
+  margin: 5px;
+}
+
+#container #text-canvas {
+  color: black;
+  display: inline-block;
+  position: absolute;
+  top: 0%;
+  left: 0%;
+}
+
+#container #prev-page:hover {
+  background-color: rgba(51, 255, 0, 0.514);
+  opacity: 1;
+}
+
+#container #next-page:hover {
+  background-color: rgba(51, 255, 0, 0.514);
+  opacity: 1;
+}
+
+#container #full-screen:hover {
+  background-color: rgba(51, 255, 0, 0.514);
+  opacity: 1;
+}
+
 .pdf-canvas {
   width: 100%;
   margin: auto;
+}
+
+.round {
+  border-radius: 50%;
 }
 
 .btn:hover {

@@ -13,8 +13,8 @@ var PORT = 9001;
 var isUseHTTPs = false;
 
 const jsonPath = {
-    config: 'config.json',
-    logs: 'logs.json'
+    config: '/home/isis/livenote/rtc-server/RTCMultiConnection-Server/config.json',
+    logs: '/home/isis/livenote/rtc-server/RTCMultiConnection-Server/logs.json'
 };
 
 const BASH_COLORS_HELPER = RTCMultiConnectionServer.BASH_COLORS_HELPER;
