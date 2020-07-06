@@ -240,7 +240,7 @@ function InitThis(mode, path, slide) {
     var connection = new RTCMultiConnection();
 
     // this line is VERY_important
-    connection.socketURL = "http://localhost:9001/";
+    connection.socketURL = "http://isiswork00.di.unisa.it:9001/";
    
     connection.session = {
       audio: true,

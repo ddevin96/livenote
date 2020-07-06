@@ -8,7 +8,7 @@ import (
 	"net/http"
 	"os"
 	"strings"
-	"time"
+	 "crypto/tls" 
 
 	"./utils"
 
@@ -19,7 +19,7 @@ import (
 )
 
 // IP adress
-const IP = "127.0.0.1"
+const IP = "isiswork00.di.unisa.it"
 
 // PORT local
 const PORT = "8080"
@@ -57,6 +57,14 @@ func init() {
 var LayoutDir = "templates/*.gohtml"
 var server *socketio.Server
 
+func httpsRedirect(w http.ResponseWriter, r *http.Request) {
+    http.Redirect(
+        w, r,
+        "https://"+r.Host+r.URL.String(),
+        http.StatusMovedPermanently,
+    )
+}
+
 func main() {
 
 	utils.LoadTemplates(LayoutDir)
@@ -72,14 +80,14 @@ func main() {
 	//TODO serve static files
 	staticDirFiles := http.FileServer(http.Dir("./static/"))
 	r.PathPrefix("/static/").Handler(http.StripPrefix("/static/", staticDirFiles))
-
-	srv := &http.Server{
+/* 
+ 	srv := &http.Server{
 		Handler: r,
 		Addr:    IP + ":" + PORT,
 		// Good practice: enforce timeouts for servers you create!
 		WriteTimeout: 15 * time.Second,
 		ReadTimeout:  15 * time.Second,
-	}
+	} */
 
 	s, err := socketio.NewServer(nil)
 	server = s
@@ -95,7 +103,18 @@ func main() {
 
 	r.Handle("/socket.io/", server)
 
-	log.Fatal(srv.ListenAndServe())
+	go http.ListenAndServe(":80", http.HandlerFunc(httpsRedirect))
+
+	//log.Fatal(srv.ListenAndServe())
+	var tlsCertPath = "/etc/letsencrypt/live/isiswork00.di.unisa.it/fullchain.pem"
+	var tlsKeyPath = "/etc/letsencrypt/live/isiswork00.di.unisa.it/privkey.pem"
+
+	config := &tls.Config{MinVersion: tls.VersionTLS10}
+    server := &http.Server{Addr: ":443", Handler: r, TLSConfig: config}
+
+	server.ListenAndServeTLS(tlsCertPath, tlsKeyPath)
+	
+
 	//http.ListenAndServe("http://"+IP+":"+PORT, nil)
 }
 
@@ -183,9 +202,9 @@ func deletePostHandler(w http.ResponseWriter, r *http.Request) {
 
 // indexPostHandler create a session for the user who upload a file, and save this file in a specific folder
 func indexPostHandler(w http.ResponseWriter, r *http.Request) {
-
+	r.Body = http.MaxBytesReader(w, r.Body, 32<<20+512)
 	//max 10 MB files
-	r.ParseMultipartForm(10 << 20)
+	r.ParseMultipartForm( 32<<20)
 	file, _, err := r.FormFile("file")
 	if err != nil {
 		fmt.Printf("Error parsing file or not file is present to upload")
