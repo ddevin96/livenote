@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Linenote++</title>
+    <link href="/style/index.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css?family=Press+Start+2P" rel="stylesheet">
+    <link href="https://unpkg.com/nes.css/css/nes.css" rel="stylesheet" />
+    <link rel="stylesheet" href="./ext/dropzone-5.7.0/dist/dropzone.css">
+
+</head>
+<body>
+
+<div class="cards">
+    <div class="nes-container with-title is-centered">
+        <p class="title">Livenote++</p>
+        <p>Welcome to ISISLab live presentation system.</p>
+        <p>This project is under development, please be patient with our 🐛</p>
+  </div>
+   <div class="nes-container is-dark card with-title">
+        <p class="title">Drag here or select your file</p>
+        <label class="nes-btn">
+         <form id="fileDrop" action="/" class="dropzone" enctype="multipart/form-data" method="post"></form>
+        </label>
+ </div>
+  <div id="livenotelink" class="nes-container card-link with-title">
+        <p class="title">Your Livenote++ Link</p>
+        <div>
+             <%if (element != "") { %>
+            <li><a href="/<%= element %>"  target="_blank"><%= element %></a></li>
+            <% } %>
+         </div>
+ </div>
+ 
+</div>
+ 
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+    <script src="./ext/dropzone-5.7.0/dist/dropzone.js"></script>
+      <script>
+        Dropzone.options.fileDrop = {
+            paramName: 'file',
+            maxFilesize: 100, // MB
+            maxFiles: 1,
+            timeout: 0,
+            uploadMultiple: false,
+            dictDefaultMessage: 'DRAG || SELECT PDF',
+            acceptedFiles: '.pdf',
+            init: function () {
+            this.on("complete", function (file) {
+            if (this.getUploadingFiles().length === 0 && this.getQueuedFiles().length === 0) {
+                this.removeFile(file);
+                location.reload();
+            }
+            });
+        }
+        };
+    </script>
+</body>
+</html>
