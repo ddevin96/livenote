@@ -8,6 +8,9 @@ Start using Node
 # Install dependencies for server
 npm install
 
+# Start turn
+systemctl start coturn
+
 # Run the server
 node server
 ```

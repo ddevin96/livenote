@@ -15,20 +15,22 @@
 <div class="cards">
     <div class="nes-container with-title is-centered">
         <p class="title">Livenote++</p>
-        <p>Welcome to ISISLab live presentation system.</p>
-        <p>This project is under development, please be patient with our 🐛</p>
+        <p>Welcome to</p>
+        <img src="img/logo.png" alt="logo ISISLab" width="150">
+        <p>live keynote.</p>
+        <p style="font-size:10px;text-align:left;">This project is under development, please be patient with our 🐛, they will grow slowly, and become beautiful features 🦋</p>
   </div>
-   <div class="nes-container is-dark card with-title">
-        <p class="title">Drag here or select your file</p>
-        <label class="nes-btn">
+   <div class="nes-container is-dark card with-title is-centered">
+        <p class="title">Drag here or click to select your file</p>
+       
          <form id="fileDrop" action="/" class="dropzone" enctype="multipart/form-data" method="post"></form>
-        </label>
+        
  </div>
-  <div id="livenotelink" class="nes-container card-link with-title">
+  <div id="livenotelink" class="nes-container card-link with-title is-centered">
         <p class="title">Your Livenote++ Link</p>
         <div>
              <%if (element != "") { %>
-            <li><a href="/<%= element %>"  target="_blank"><%= element %></a></li>
+            <a style="font-size:14px;" class="center" href="/<%= element %>"  target="_blank"><%= element %></a>
             <% } %>
          </div>
  </div>
@@ -44,7 +46,7 @@
             maxFiles: 1,
             timeout: 0,
             uploadMultiple: false,
-            dictDefaultMessage: 'DRAG || SELECT PDF',
+            dictDefaultMessage: 'PDF FILE',
             acceptedFiles: '.pdf',
             init: function () {
             this.on("complete", function (file) {

@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <link rel="shortcut icon" href="#" />
     <title>Livenote++</title>
     <meta charset="UTF-8" />
     <link href="/style/styles.css" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css?family=Press+Start+2P" rel="stylesheet">
     <link href="https://unpkg.com/nes.css/css/nes.css" rel="stylesheet" />
-    <link rel="shortcut icon" href="#" />
     <style>
        html, body, pre, code, kbd, samp {
            font-family: 'Press Start 2P';font-size: 1em;
@@ -15,26 +15,34 @@
   </head>
   <body onload="">
    <div id="container">
-      <canvas class="pdf-canvas" id="pdf-render"></canvas>
-      <img id="info"  style="image-rendering: pixelated;" src="https://img.icons8.com/color/100/000000/nintendo-entertainment-system.png"/>
+      <canvas class="pdf-canvas " id="pdf-render">
+      </canvas>
+       <img id="info"  class="control" style="image-rendering: pixelated;" src="https://img.icons8.com/color/100/000000/nintendo-entertainment-system.png"/>
       <button class="nes-btn is-warning control" id="full-screen"> Full-Screen <i class="fas fa-compress"></i></button>
+      <button class="nes-btn is-primary control" id="prev-page">&#8249;Prev</button>
+      <button class="nes-btn is-primary control" id="next-page">Next&#8250;</button>    
       <progress class="nes-progress is-pattern control" id="progress-bar" value="1"  ></progress>
+      <span id="startlive" class="nes-logo control"></span>
+      <div id="select-audio" class="nes-select is-success select control" style="display:none;">
+          <select id="audioSource"></select>
+      </div>
+      <div id="select-video" class="nes-select is-warning select control" style="display:none;">
+         <select id="videoSource"></select>
+       </div>
     </div>
-    
+
     <div id ="liveperson" class="draggable big-video" style="display:none;"> 
        <div id ="video-balloon-container"> 
-          <video id="video-balloon" class = "web-cam" playsinline></video>
+          <video id = "video-balloon" class = "web-cam" playsinline autoplay muted></video> 
           <span id="video-avatar" style="" class="nes-bcrikko"></span> 
-          <div id = "pokemon" class = "nes-bcrikko" ></div>
-          <img id = "play" class="nes-avatar is-large" alt="Gravatar image example" src="https://img.icons8.com/color/48/000000/circled-play--v1.png" style="image-rendering: pixelated;">
-          <img id = "vol"class="nes-avatar is-large" alt="Gravatar image example" src="https://img.icons8.com/color/48/000000/low-volume--v1.png" style="image-rendering: pixelated;">
+          <div id = "pokemon" class = "nes-charmander" ></div>
           <span id="size" class="nes-icon is-medium star"> </span>
           </section>
        </div>
-       
+      
     </div>
 
-   <div  id="chat" class="nes-table-responsive draggable ">
+     <div  id="chat" class="nes-table-responsive draggable ">
     <table class=" nes-table  is-bordered is-centered table-chat " style="position: absolute;bottom: 0;  background-color: rgba(255, 255, 255, 0.5);">
       <tbody>
         <tr>
@@ -76,7 +84,17 @@
       </form>
     </dialog>
 
-    <dialog class="nes-dialog center" id="dialog-info">
+    <dialog class="nes-dialog is-dark is-rounded center"  id="dialog-play">
+    <form method="dialog">
+      <p class="title">Play audio and video</p>
+      <p>Are you sure?</p>
+      <menu class="dialog-menu">
+        <button class="nes-btn">Cancel</button>
+        <button class="nes-btn is-primary" style="margin-left:50%;" id="play">Play Now!</button>
+      </menu>
+    </form>
+  </dialog>
+      <dialog class="nes-dialog center" id="dialog-info">
     <form method="dialog">
       <p class="title">Livenote++</p>
       <p>Welcome to our presentation system.</p>
@@ -98,17 +116,21 @@
       </menu>
     </form>
   </dialog>
- 
+
+   
+    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js"></script>
-    <script type="module" src="/livenote-drag.js" ></script>
-    <script src="/livenote-client.js" ></script>
+    <script type="module" src="/js/livenote-drag.js" ></script>
+    <script src="/js/common.js" ></script>
+    <script src="/master/livenote-master.js" ></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://mozilla.github.io/pdf.js/build/pdf.js"></script>
 
     <script>
       window.onload  = function() {
-       initclient(window.location.pathname)
-       initThis(1,window.location.origin+"/sessions"+window.location.pathname+".pdf",1)
+       initmaster(window.location.pathname)
+       initThis(0,window.location.origin+"/sessions"+window.location.pathname+".pdf",1)
+      // console.log(window.location.origin+"/sessions"+window.location.pathname+".pdf")
       }
       window.onresize = function(){
           resize()
@@ -116,3 +138,4 @@
     </script>
   </body>
 </html>
+

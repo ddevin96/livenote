@@ -1,92 +1,35 @@
 const express = require("express");
-var fs = require( 'fs' );
-var path = require('path');
 const app = express();
-var path = require('path');
 const fileUpload = require('express-fileupload');
+const https = require("https");
 var fs = require( 'fs' );
+var path = require('path');
 var shortid = require('shortid');
+var cookieSession = require('cookie-session');
 let ejs = require('ejs');
 
-var cookieSession = require('cookie-session');
-
+//Template engine
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
 let broadcaster;
 const port = 443;
 
-const https = require("https");
-
+/*
+Create https server with certificate
+*/
 const server = https.createServer({ 
   key: fs.readFileSync("/etc/letsencrypt/live/isiswork00.di.unisa.it/privkey.pem"),
   cert: fs.readFileSync("/etc/letsencrypt/live/isiswork00.di.unisa.it/fullchain.pem") 
 },app);
 
-
-function makeitlive(socket){
-  socket.on("broadcaster", () => {
-    broadcaster = socket.id;
-    socket.broadcast.emit("broadcaster");
-  });
-  socket.on("watcher", () => {
-    socket.to(broadcaster).emit("watcher", socket.id);
-  });
-  socket.on("offer", (id, message) => {
-    socket.to(id).emit("offer", socket.id, message);
-  });
-  socket.on("answer", (id, message) => {
-    socket.to(id).emit("answer", socket.id, message);
-  });
-  socket.on("candidate", (id, message) => {
-    socket.to(id).emit("candidate", socket.id, message);
-  });
-  socket.on("disconnect", () => {
-    if(chat_users_for_namespaces[socket.nsp.name]!= undefined && chat_users_for_namespaces[socket.nsp.name][socket.id] != undefined){
-      delete chat_users_for_namespaces[socket.nsp.name][socket.id];
-     }
-    socket.broadcast.emit("chat-list", chat_users_for_namespaces[socket.nsp.name]);
-    socket.to(broadcaster).emit("disconnectPeer", socket.id);
-  });
-  socket.on("master", (data) => {
-    socket.broadcast.emit("slidechanged", data);
-  });
-  socket.on("chat-message", (nickname, message) => {
-     socket.broadcast.emit("chat-message", nickname, message);
-   });
-   socket.on("chat-enter", (nickname) => {
-     
-     if(chat_users_for_namespaces[socket.nsp.name] == undefined){
-      chat_users_for_namespaces[socket.nsp.name] = {}
-     }
-     chat_users_for_namespaces[socket.nsp.name][socket.id] = nickname;
-
-     socket.broadcast.emit("chat-list", chat_users_for_namespaces[socket.nsp.name]);
-     socket.emit("chat-list", chat_users_for_namespaces[socket.nsp.name]);
-   });
-   socket.on("pokemon", (status, name) => {
-
-      socket.broadcast.emit("pokemon-update", status, name);
-    });
-}
-var chat_users_for_namespaces = {}
-
-function createnewlive(name){
-  console.log("New live at "+name)
-  const nm = io.of(name);
-  nm.on("error", e => console.log(e));
-  nm.on("connection", socket => makeitlive(socket));
-}
-
 const io = require("socket.io")(server);
 
 app.use(express.static(__dirname + "/public"));
 app.use(express.static(__dirname + '/public/sessions'));
-
 app.use(fileUpload({
   limits: {fileSize: 50 * 1024 * 1024},
 }));
-
 app.use(cookieSession({
   id:'',
   links: [],
@@ -94,6 +37,11 @@ app.use(cookieSession({
   keys: ['livenote','++']
 }))
 
+/*
+Index page - GET
+Check if the user is new, otherwise render the page with the right informations
+TODO: manage more then 1 file
+*/
 app.get('/', function(req, res) {
   var sess = req.session;
   if (sess.isNew){
@@ -114,20 +62,27 @@ app.get('/', function(req, res) {
  }
 });
 
-//GET
+/*
+Dynamic page for presentation - GET
+Check if you are master or slave and render the page
+*/
 app.get('/:session_id/:file_id', function(req, res) {
   sid = req.params.session_id;
   fid = req.params.file_id;
   var sess = req.session;
   if (sess.isNew || sess.id != sid){
-    res.sendFile(path.join(__dirname + '/public/slave.html'))
+    res.sendFile(path.join(__dirname + '/public/slave/slave.html'))
   }else{
-    res.sendFile(path.join(__dirname + '/public/master.html'))
+    res.sendFile(path.join(__dirname + '/public/master/master.html'))
   }
   //res.sendFile(path.join(__dirname + '/public/upload.html'))
 })
 
-//POST
+/*
+Index page - POST
+Manage the upload of the file - for now only pdf
+TODO: manage different type of files
+*/
 app.post('/', function(req, res) {
   var id = shortid.generate();
   var sess = req.session;
@@ -171,6 +126,20 @@ app.post('/', function(req, res) {
   res.redirect(301, 'back');
 })
 
+/*
+Create livenote for the name specified 
+eg: /abc/def
+*/
+function createnewlive(name){
+  console.log("New live at "+name)
+  const nm = io.of(name);
+  nm.on("error", e => console.log(e));
+  nm.on("connection", socket => makeitlive(socket));
+}
+
+/*
+Load a session for each file on the server
+*/
 function loadSessions(){
   const directoryPath = path.join(__dirname, 'public/sessions');
   fs.readdir(directoryPath, function (err, files) {
@@ -190,6 +159,53 @@ function loadSessions(){
       });
   });
 }
+
+/*
+Create socket connection for each name
+*/
+function makeitlive(socket){
+  socket.on("broadcaster", () => {
+    broadcaster = socket.id;
+    socket.broadcast.emit("broadcaster");
+  });
+  socket.on("watcher", () => {
+    socket.to(broadcaster).emit("watcher", socket.id);
+  });
+  socket.on("offer", (id, message) => {
+    socket.to(id).emit("offer", socket.id, message);
+  });
+  socket.on("answer", (id, message) => {
+    socket.to(id).emit("answer", socket.id, message);
+  });
+  socket.on("candidate", (id, message) => {
+    socket.to(id).emit("candidate", socket.id, message);
+  });
+  socket.on("disconnect", () => {
+    if(chat_users_for_namespaces[socket.nsp.name]!= undefined && chat_users_for_namespaces[socket.nsp.name][socket.id] != undefined){
+      delete chat_users_for_namespaces[socket.nsp.name][socket.id];
+     }
+    socket.broadcast.emit("chat-list", chat_users_for_namespaces[socket.nsp.name]);
+    socket.to(broadcaster).emit("disconnectPeer", socket.id);
+  });
+  socket.on("master", (data) => {
+    socket.broadcast.emit("slidechanged", data);
+  });
+  socket.on("chat-message", (nickname, message) => {
+     socket.broadcast.emit("chat-message", nickname, message);
+  });
+  socket.on("chat-enter", (nickname) => {
+    if(chat_users_for_namespaces[socket.nsp.name] == undefined){
+    chat_users_for_namespaces[socket.nsp.name] = {}
+    }
+    chat_users_for_namespaces[socket.nsp.name][socket.id] = nickname;
+    socket.broadcast.emit("chat-list", chat_users_for_namespaces[socket.nsp.name]);
+    socket.emit("chat-list", chat_users_for_namespaces[socket.nsp.name]);
+  });
+  socket.on("pokemon", (status, name) => {
+    socket.broadcast.emit("pokemon-update", status, name);
+  });
+}
+var chat_users_for_namespaces = {}
 
 loadSessions()
 server.listen(port, () => console.log(`Server is running on port ${port}`));

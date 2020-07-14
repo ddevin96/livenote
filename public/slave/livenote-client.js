@@ -70,19 +70,22 @@ function initServices(mysocket){
    
     if(e.ctrlKey && e.altKey && e.keyCode == 67){
       showChat();
-       //CTRL + ALT + t keydown combo
+       //CTRL + ALT + T keydown combo
     }else if(e.ctrlKey && e.altKey && e.keyCode == 80){
       makepokemon();
-       //CTRL + ALT + p keydown combo
+       //CTRL + ALT + P keydown combo
     }else if(e.ctrlKey && e.altKey && e.keyCode == 77){
       hidecontrol();
-       //CTRL + ALT + m keydown combo
+       //CTRL + ALT + M keydown combo
     } else if(e.ctrlKey && e.altKey && e.keyCode == 65){
       changepokemon();
        //CTRL + ALT + A keydown combo
+    }else if(e.ctrlKey && e.altKey && e.keyCode == 80){
+      start();
+       //CTRL + ALT + P keydown combo
     }
-  });
- 
+  })
+
   socket.on("chat-list", (list) => {
     if(list == undefined) return;
     $("#ul-users").empty();
@@ -142,17 +145,17 @@ function makepokemon(){
   }
 }
 function updatepokemon(status, name){
-  if(status){
-    $('#video-balloon').hide();
-    $('#video-avatar').hide();
-    $('#pokemon').removeClass();
-    $('#pokemon').addClass(name);
-    $('#pokemon').show();
-  }else {
-    $('#video-balloon').show();
-    $('#video-avatar').show();
-    $('#pokemon').hide()
-  }
+    if(status){
+      $('#video-balloon').hide();
+      $('#video-avatar').hide();
+      $('#pokemon').removeClass();
+      $('#pokemon').addClass(name);
+      $('#pokemon').show();
+    }else {
+      $('#video-balloon').show();
+      $('#video-avatar').show();
+      $('#pokemon').hide()
+    }
 }
 function changepokemon(){
   hide = $('#video-balloon').is(':hidden')
@@ -163,22 +166,10 @@ function changepokemon(){
     updatepokemon(true, pokemons[mypokemon]);
   }
 }
-
-function initThis(mode, path, slide) {
-
-    
+  function initThis(mode, path, slide) {
+        
     pmode = mode;
-    if (mode == 1) {
-      socket.on( "slidechanged", function (msg) {
-        console.log("Presentation Change "+msg); 
-        s = JSON.parse(msg)
-        loadStatus(s);
-      });
-      socket.on( "pokemon", function (status, name) {
-        updatepokemon(status,name)
-      });
-  }
-
+     
     document.querySelector('#pdf-render').addEventListener('touchstart', function(e){
       console.log("starting touch")
       touchPressed = true;
@@ -245,13 +236,8 @@ function initThis(mode, path, slide) {
     .getDocument(path)
     .promise.then(pdfDoc_ => {
       pdfDoc = pdfDoc_;
-
       document.getElementById("progress-bar").setAttribute("max", pdfDoc.numPages);
       renderPage(slide);
-      $('#info').click( function()
-      {
-        document.getElementById('dialog-info').showModal();
-      });
     })
     .catch(err => {
       // Display error
@@ -262,10 +248,12 @@ function initThis(mode, path, slide) {
       // Remove top bar
       document.querySelector('.top-bar').style.display = 'none';
     });
-
+    $('#info').click( function()
+    {
+      document.getElementById('dialog-info').showModal();
+    });
+    
 }
-
-
 
 
 let pdfDoc = null,
@@ -287,36 +275,17 @@ const renderPage = num => {
   // Get page
   pdfDoc.getPage(num).then(page => {
 
-    var viewport = page.getViewport({ scale: 1, });
-    console.log(viewport.width +" "+viewport.height+" "+scale)
-    var scale = Math.min((window.innerHeight / viewport.height), (window.innerWidth / viewport.width));
-    
-    var viewport = page.getViewport({scale: scale,});
-   
-     canvas.height = window.innerHeight;
-    canvas.width = viewport.width; 
-   // canvas.height =  page.getViewport({ scale: 1, }).height;
-   // canvas.width = page.getViewport({ scale: 1, }).width;
-    
- 
-   var viewport = page.getViewport({ scale: 1, });
-   if(viewport.width > viewport.height){
-    var d =  window.innerWidth;
-    var scale = d / viewport.width;
-    var viewport = page.getViewport({ scale: scale, });
-    canvas.height = viewport.height;
-    canvas.width = window.innerWidth; 
- 
-   }else{
-      var d =  window.innerHeight;
-      var scale = d / viewport.height;
-      var viewport = page.getViewport({ scale: scale, });
-      canvas.height = window.innerHeight;
-      canvas.width = viewport.width; 
-   }
-   
 
-        const renderCtx = {
+
+      var viewport = page.getViewport({ scale: 1, });
+      var scale = Math.min((window.innerHeight / viewport.height), (window.innerWidth / viewport.width));
+      console.log(window.innerHeight +" "+viewport.width+" "+scale)
+      var viewport = page.getViewport({scale: scale,});
+     
+      canvas.height = viewport.height;
+      canvas.width = viewport.width;
+      
+      const renderCtx = {
           canvasContext: ctx,
           viewport
         };
@@ -329,9 +298,6 @@ const renderPage = num => {
             pageNumIsPending = null;
           }
         });
-
-        // Output current page
-       
       });
     };
 
@@ -344,40 +310,23 @@ const renderPage = num => {
     }
   };
 
-// Show Prev Page
-const showPrevPage = () => {
-  if (pageNum <= 1) {
-    return;
-  }
-  pageNum--;
-  (pmode == 0) && sendMasterStatus(pageNum);
-  queueRenderPage(pageNum);
-  document.getElementById("progress-bar").setAttribute("value", pageNum);
-};
-
-// Show Next Page
-const showNextPage = () => {
-  if (pageNum >= pdfDoc.numPages) {
-    return;
-  }
-  pageNum++;
-  (pmode == 0) && sendMasterStatus(pageNum);
-  queueRenderPage(pageNum);
-  document.getElementById("progress-bar").setAttribute("value", pageNum);
-
-};
-function sendMasterStatus(pageNum){
-  status.nslide = pageNum;
-  console.log(socket);
-  socket.emit("master", JSON.stringify(status), function (data) {      
-    console.log('Message next page sent! '+ status.nslide);
-  }); 
- 
-}
 // Go FullScreen when clicked on the button
 const goFullScreen = () => {
   //document.getElementsByTagName("body")[0].requestFullscreen();
   var elem = document.getElementsByTagName("body")[0];
+
+  if ( $('#full-screen').text()=="Close"){
+    if (document.exitFullscreen) {
+      document.exitFullscreen();
+    } else if (document.mozCancelFullScreen) { /* Firefox */
+      document.mozCancelFullScreen();
+    } else if (document.webkitExitFullscreen) { /* Chrome, Safari and Opera */
+      document.webkitExitFullscreen();
+    } else if (document.msExitFullscreen) { /* IE/Edge */
+      document.msExitFullscreen();
+    }
+    return;
+  }
 
   if (elem.requestFullscreen) {
     elem.requestFullscreen();
@@ -388,7 +337,7 @@ const goFullScreen = () => {
   } else if (elem.msRequestFullscreen) { /* IE/Edge */
     elem.msRequestFullscreen();
   }
-  $('#full-screen').hide()
+  $('#full-screen').text("Close")
 };
 
 // Listener on going full screen
@@ -408,29 +357,7 @@ function closeFullScreen () {
   }
 }
 
-//switch page with arrow keys
-document.onkeydown = function(e) {
-  switch (e.keyCode) {
-    //left arrow
-    case 37:
-      showPrevPage();
-      break;
-    //up arrow
-    case 38:
-      break;
-    //right arrow
-    case 39:
-      showNextPage();
-      break;
-    //down arrow
-    case 40:
-      break;
-  }
-}
-
 // Button Events
-document.querySelector('#prev-page').addEventListener('click', showPrevPage);
-document.querySelector('#next-page').addEventListener('click', showNextPage);
 document.querySelector('#full-screen').addEventListener('click', goFullScreen);
 
 
@@ -445,6 +372,8 @@ let pmode = -1;
 function loadStatus(s){
   status = s
   queueRenderPage(s.nslide);
+  pageNum = s.nslide
+  document.getElementById("progress-bar").setAttribute("value", s.nslide);
 }
 function loadShape(s){
   nwidth = $(window).width()
@@ -490,8 +419,7 @@ function clearArea() {
 
 
 /*AUDIO VIDEO */
-
-const peerConnections = {};
+let peerConnection;
 const config = {
   iceServers: [
     {
@@ -501,156 +429,72 @@ const config = {
   ]
 };
 
-window.onunload = window.onbeforeunload = () => {
-  console.log("Close socket")
-  socket.close();
-};
-
-if (document.getElementById("video") != undefined )
-document.getElementById("video").addEventListener('click', function(event){
-//<img src="https://img.icons8.com/color/48/000000/record.png"/>  
-//<img src="https://img.icons8.com/color/48/000000/stop.png"/>   
-});
-if (document.getElementById("audio") != undefined )
-document.getElementById("audio").addEventListener('click', function(event){
-//https://img.icons8.com/color/48/000000/play-record.png
-//<img src="https://img.icons8.com/color/48/000000/block-microphone.png"/>  
-});
-
-
 var socket;
-
-function initmaster(namespace){
-  console.log("Connect to "+window.location.origin+namespace)
+function initclient(namespace)
+{
   socket = io.connect(window.location.origin+namespace, {
     reconnection: true,
     reconnectionDelay: 1000,
     reconnectionDelayMax : 5000,
     reconnectionAttempts: 99999
   });
-
-  socket.on("answer", (id, description) => {
-    peerConnections[id].setRemoteDescription(description);
+  socket.on( "slidechanged", function (msg) {
+    console.log("Presentation Change "+msg); 
+    s = JSON.parse(msg)
+    loadStatus(s);
   });
-  
-  socket.on("watcher", id => {
-    const peerConnection = new RTCPeerConnection(config);
-    peerConnections[id] = peerConnection;
-  
-    let stream = videoElement.srcObject;
-    stream.getTracks().forEach(track => peerConnection.addTrack(track, stream));
-  
+  socket.on( "pokemon-update", function (status, name) {
+    updatepokemon(status,name)
+  });  
+  //TODO BUG quando un client si collega se il video è in modalità pokemon può vederlo, lo stesso, quando si collega deve chiedere il permesso del video
+
+
+  socket.on("offer", (id, description) => {
+    console.log(id)
+    console.log(description)
+    
+    peerConnection = new RTCPeerConnection(config);
+    peerConnection
+      .setRemoteDescription(description)
+      .then(() => peerConnection.createAnswer())
+      .then(sdp => peerConnection.setLocalDescription(sdp))
+      .then(() => {
+        $('#liveperson').show();
+        socket.emit("answer", id, peerConnection.localDescription);
+      });
+    peerConnection.ontrack = event => {
+      video.srcObject = event.streams[0];
+    };
     peerConnection.onicecandidate = event => {
       if (event.candidate) {
         socket.emit("candidate", id, event.candidate);
       }
     };
-  
-    peerConnection
-      .createOffer()
-      .then(sdp => peerConnection.setLocalDescription(sdp))
-      .then(() => {
-        socket.emit("offer", id, peerConnection.localDescription);
-      });
   });
-  
   socket.on("candidate", (id, candidate) => {
-    peerConnections[id].addIceCandidate(new RTCIceCandidate(candidate));
+    peerConnection
+      .addIceCandidate(new RTCIceCandidate(candidate))
+      .catch(e => console.error(e));
   });
   
-  socket.on("disconnectPeer", id => {
-    peerConnections[id].close();
-    delete peerConnections[id];
+  socket.on("connect", () => {
+    socket.emit("watcher");
+  });
+  
+  socket.on("broadcaster", () => {
+    socket.emit("watcher");
+  });
+  
+  socket.on("disconnectPeer", () => {
+    peerConnection.close();
   });
 
-    // Get camera and microphone
-  const videoElement = document.querySelector("video");
-  const audioSelect = document.querySelector("select#audioSource");
-  const videoSelect = document.querySelector("select#videoSource");
+  initServices(socket);
 
-  audioSelect.onchange = getStream;
-  videoSelect.onchange = getStream;
-
-    function gotDevices(deviceInfos) {
-      window.deviceInfos = deviceInfos;
-      for (const deviceInfo of deviceInfos) {
-        const option = document.createElement("option");
-        option.value = deviceInfo.deviceId;
-        if (deviceInfo.kind === "audioinput") {
-          option.text = deviceInfo.label || `Microphone ${audioSelect.length + 1}`;
-          audioSelect.appendChild(option);
-        } else if (deviceInfo.kind === "videoinput") {
-          option.text = deviceInfo.label || `Camera ${videoSelect.length + 1}`;
-          videoSelect.appendChild(option);
-        }
-      }
-    }
-    
-    function getStream() {
-      if (window.stream) {
-        window.stream.getTracks().forEach(track => {
-          track.stop();
-        });
-      }
-      const audioSource = audioSelect.value;
-      const videoSource = videoSelect.value;
-      const constraints = {
-        audio: { deviceId: audioSource ? { exact: audioSource } : undefined },
-        video: { deviceId: videoSource ? { exact: videoSource } : undefined }
-      };
-      return navigator.mediaDevices
-        .getUserMedia(constraints)
-        .then(gotStream)
-        .catch(handleError);
-    }
-    
-    function gotStream(stream) {
-      window.stream = stream;
-      audioSelect.selectedIndex = [...audioSelect.options].findIndex(
-        option => option.text === stream.getAudioTracks()[0].label
-      );
-      videoSelect.selectedIndex = [...videoSelect.options].findIndex(
-        option => option.text === stream.getVideoTracks()[0].label
-      );
-      videoElement.srcObject = stream;
-      socket.emit("broadcaster");
-    }
-  
-    $('#startlive').click( function()
-    {
-      startLive();
-    });
-    
-    function handleError(error) {
-      console.error("Error: ", error);
-    }
-
-    function startLive(){
-      document.getElementById('dialog-play').showModal();
-          $('#play').click( function()
-            { 
-              getStream()
-              .then(getDevices)
-              .then(gotDevices);
-              function getDevices() {
-                $('#startlive').removeClass("nes-logo");
-                $('#liveperson').show();
-                $('#select-audio').show();
-                $('#select-video').show();
-               
-               // $('#startlive').addClass("nes-mario");
-                return navigator.mediaDevices.enumerateDevices();
-              }
-            }
-          );
-    }
-    $(document).keydown(function(e){
-      if(e.ctrlKey && e.altKey && e.keyCode == 76){
-        startLive();
-         //CTRL + ALT + l keydown combo
-      }
-    });
-    initServices(socket);
 }
 
+const video = document.querySelector("video");
 
+window.onunload = window.onbeforeunload = () => {
+  socket.close();
+};

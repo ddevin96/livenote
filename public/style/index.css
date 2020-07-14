@@ -12,6 +12,15 @@ body { padding: 1rem; }
   padding: 1rem;
 
 }
+#fileDrop {
+  border: 0 !important;
+  background-color: transparent !important;
+  width: 100% !important;
+  height: 100% !important;
+  text-align: center;
+  z-index:3;
+}
+
 .card-link {
   min-width:800px;
   padding: 1rem;
@@ -21,6 +30,9 @@ body { padding: 1rem; }
     min-width:200px;
     padding: 1rem;
   }
+}
+#livenotelink{
+  min-height:200px;
 }
 
 .cards {
