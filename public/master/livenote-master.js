@@ -208,7 +208,13 @@ function initmaster(namespace){
     }
 
     function startLive(){
-      document.getElementById('dialog-play').showModal();
+      var dial = document.getElementById('dialog-play')
+      if (typeof dial.showModal === "function") {
+        dial.showModal();
+      } else {
+        alert("The <dialog> API is not supported by this browser");
+      }
+      //document.getElementById('dialog-play').showModal();
           $('#play').click( function()
             { 
               getStream()

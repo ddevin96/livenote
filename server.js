@@ -204,6 +204,15 @@ function makeitlive(socket){
   socket.on("pokemon", (status, name) => {
     socket.broadcast.emit("pokemon-update", status, name);
   });
+  socket.on("shape", (data) => {
+    socket.broadcast.emit("shapechanged", data);
+  });
+  socket.on("color", (data) => {
+    socket.broadcast.emit("colorchanged", data);
+  });
+  socket.on("line", (data) => {
+    socket.broadcast.emit("linechanged", data);
+  });
 }
 var chat_users_for_namespaces = {}
 

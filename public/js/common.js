@@ -239,6 +239,43 @@ function addNewMessage(name, message){
    scrollChatList();
 }
 
+var colors =  [
+  "#000000", //black
+  "#FF0000", //red
+  "#008000" //verde
+]
+var mycolor = 0;
+
+function changeColor(){
+  if(pmode == 0) {
+    mycolor = (mycolor + 1) % colors.length;
+    ctx.strokeStyle = colors[mycolor];
+    socket.emit("color", colors[mycolor]);
+  }
+}
+
+function updateColor(data){
+  if(pmode == 1) {
+    ctx.strokeStyle = data;
+  }
+}
+
+var myLineWidth = 1;
+
+function changeLineWidth(){
+  if(pmode == 0) {
+    myLineWidth = (myLineWidth + 1) % 5;
+    ctx.lineWidth = myLineWidth;
+    socket.emit("line", myLineWidth);
+  }
+}
+
+function updateLine(data){
+  if(pmode == 1) {
+    ctx.lineWidth = data;
+  }
+}
+
 function initServices(mysocket){
 
   $(document).keydown(function(e){
@@ -255,6 +292,12 @@ function initServices(mysocket){
     } else if(e.ctrlKey && e.altKey && e.keyCode == 65){
       changepokemon();
        //CTRL + ALT + A keydown combo
+    } else if(e.ctrlKey && e.altKey && e.keyCode == 87){
+      changeLineWidth();
+       //CTRL + ALT + w keydown combo
+    } else if(e.ctrlKey && e.altKey && e.keyCode == 81){
+      changeColor();
+       //CTRL + ALT + q keydown combo
     }
   });
  
@@ -300,6 +343,18 @@ function initThis(mode, path, slide) {
     });
     socket.on( "pokemon", function (status, name) {
       updatepokemon(status,name)
+    });
+    //shape
+    socket.on( "shapechanged", function (msg) {
+      console.log("shape arrived"); 
+      s = JSON.parse(msg)
+      loadShape(s)
+    });
+    socket.on("colorchanged", function (data) {
+      updateColor(data)
+    });
+    socket.on("linechanged", function (data) {
+      updateLine(data)
     });
 }
 
@@ -353,12 +408,16 @@ function initThis(mode, path, slide) {
 
   $('#pdf-render').mouseup(function (e) {
       mousePressed = false;
-  
+      socket.emit("shape", JSON.stringify(shape), function (data) {      
+        console.log('Message shape sent! ');
+      });
       shape = {"data":[], "width":$(window).width() , "height": $(window).height()}
   });
   $('#pdf-render').mouseleave(function (e) {
       mousePressed = false;
-     
+      socket.emit("shape", JSON.stringify(shape), function (data) {      
+        console.log('Message shape sent! ');
+      });
       shape = {"data":[], "width":$(window).width() , "height": $(window).height()}
   });
 

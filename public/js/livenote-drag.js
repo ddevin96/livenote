@@ -12,12 +12,12 @@ document.getElementById("vol").addEventListener('click', function(event){
   if (myVideo.muted)
      {
        myVideo.muted = false;
-       $("#vol").attr("src","https://img.icons8.com/color/48/000000/low-volume--v1.png");
+       $("#vol").attr("src","../img/volume.png");
        //
      } 
   else{
     myVideo.muted = true;
-    $("#vol").attr("src","https://img.icons8.com/color/48/000000/mute.png");
+    $("#vol").attr("src","../img/mute.png");
     //<img src=""/>
   }
      
@@ -27,10 +27,10 @@ document.getElementById("play").addEventListener('click', function(event){
   var myVideo = document.getElementsByTagName('video')[0];
   if (myVideo.paused){
       myVideo.play();
-      $("#play").attr("src","https://img.icons8.com/color/48/000000/circled-pause.png");
+      $("#play").attr("src","../img/circled-pause.png");
   }else{
       myVideo.pause();
-      $("#play").attr("src","https://img.icons8.com/color/48/000000/circled-play--v1.png");
+      $("#play").attr("src","../img/play.png");
   }
  });
 
