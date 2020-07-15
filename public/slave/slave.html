@@ -16,9 +16,13 @@
   <body onload="">
     <div id="container">
       <canvas class="pdf-canvas" id="pdf-render"></canvas>
-      <img id="info"  class="control" style="image-rendering: pixelated;" src="../img/nes.png"/>
-      <button class="nes-btn is-warning control" id="full-screen"> Full-Screen <i class="fas fa-compress"></i></button>
-      <progress class="nes-progress is-pattern control" id="progress-bar" value="1"  ></progress>
+      <div id="topButtons">
+        <img id="info"  class="control" style="image-rendering: pixelated;" src="../img/nes.png"/>
+        <button class="nes-btn is-warning control" id="full-screen"> Full-Screen <i class="fas fa-compress"></i></button>
+      </div>
+      <div id="bottomButtons">
+        <progress class="nes-progress is-pattern control" id="progress-bar" value="1"  ></progress>
+      </div>
     </div>
     
     <div id ="liveperson" class="draggable big-video" style="display:none;"> 
@@ -87,6 +91,8 @@
         <p>CTRL + ALT + l -> Play video and audio</p>
         <p>CTRL + ALT + p -> Hide video (Avatar mode, only audio is shared)</p>
         <p>CTRL + ALT + a -> Change avatar</p>
+        <p>CTRL + ALT + q -> Change color of drawing</p>
+        <p>CTRL + ALT + w -> Change line width of drawing</p>
         <p>Please: consider to refresh your page, if something wrong!</p>
         <p>Notice: the presentation is totaly stateless,</p>
         <p>all your changing or messages are not stored.</p>

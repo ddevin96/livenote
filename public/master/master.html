@@ -16,17 +16,21 @@
   <body onload="">
     <div id="container">
       <canvas class="pdf-canvas " id="pdf-render"></canvas>
-      <img id="info"  class="control" style="image-rendering: pixelated;" src="../img/nes.png"/>
-      <button class="nes-btn is-warning control" id="full-screen"> Full-Screen <i class="fas fa-compress"></i></button>
-      <button class="nes-btn is-primary control" id="prev-page">&#8249;Prev</button>
-      <button class="nes-btn is-primary control" id="next-page">Next&#8250;</button>    
-      <progress class="nes-progress is-pattern control" id="progress-bar" value="1"  ></progress>
-      <span id="startlive" class="nes-logo control"></span>
-      <div id="select-audio" class="nes-select is-success select control" style="display:none;">
+      <div id="topButtons">
+        <img id="info"  class="control" style="image-rendering: pixelated;" src="../img/nes.png"/>
+        <button class="nes-btn is-warning control" id="full-screen"> Full-Screen <i class="fas fa-compress"></i></button>
+        <span id="startlive" class="nes-logo control"></span>
+        <div id="select-audio" class="nes-select is-success select control" style="display:none;">
           <select id="audioSource"></select>
+        </div>
+        <div id="select-video" class="nes-select is-warning select control" style="display:none;">
+          <select id="videoSource"></select>
+        </div>
       </div>
-      <div id="select-video" class="nes-select is-warning select control" style="display:none;">
-         <select id="videoSource"></select>
+      <div id="bottomButtons">
+        <button class="nes-btn is-primary control" id="prev-page">&#8249;Prev</button>
+        <button class="nes-btn is-primary control" id="next-page">Next&#8250;</button>    
+        <progress class="nes-progress is-pattern control" id="progress-bar" value="1"  ></progress>
       </div>
     </div>
 
@@ -105,6 +109,9 @@
       <p>CTRL + ALT + l -> Play video and audio</p>
       <p>CTRL + ALT + p -> Hide video (Avatar mode, only audio is shared)</p>
       <p>CTRL + ALT + a -> Change avatar</p>
+      <p>CTRL + ALT + q -> Change color of drawing</p>
+      <p>CTRL + ALT + w -> Change line width of drawing</p>
+
       <p>Please: consider to refresh your page, if something wrong!</p>
       <p>Notice: the presentation is totaly stateless,</p>
       <p>all your changing or messages are not stored.</p>
