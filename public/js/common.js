@@ -356,8 +356,9 @@ function initThis(mode, path, slide) {
     socket.on("linechanged", function (data) {
       updateLine(data)
     });
-}
+  }
 
+  if (mode == 0) {
   document.querySelector('#pdf-render').addEventListener('touchstart', function(e){
     console.log("starting touch")
     touchPressed = true;
@@ -422,6 +423,7 @@ function initThis(mode, path, slide) {
   });
 
   var shape = {"data":[], "width":$(window).width() , "height": $(window).height()}
+}
   // Get Document
 
   pdfjsLib
