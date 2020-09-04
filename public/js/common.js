@@ -278,6 +278,9 @@ function updateLine(data){
 
 function initServices(mysocket){
 
+  //here change for webpack
+  socket = mysocket;
+
   $(document).keydown(function(e){
    
     if(e.ctrlKey && e.altKey && e.keyCode == 67){
