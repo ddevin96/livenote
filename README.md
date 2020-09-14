@@ -1,4 +1,5 @@
 # Livenote++
+
 ## Table of contents
 * [Introduction](#Introduction)
   * [Features](#Features)
@@ -53,16 +54,6 @@ Frontend:
 # Contributing and Development
 
 ## Installation
-=======
-https://img.shields.io/discord/693092516286693387
-=======
-![Discord](https://img.shields.io/discord/693092516286693387)
->>>>>>> Update README.md
-
-=======
->>>>>>> Update README.md
-## Getting started
->>>>>>> Update README.md
 
 Start using Node
 
